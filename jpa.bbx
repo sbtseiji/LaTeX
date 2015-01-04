@@ -561,7 +561,7 @@
   {\iffieldundef{number}{}
   {\addcomma\addspace\printtext[noformat]{No.\printfield{number}}}}
   {\setunit{\addcomma\addspace}\printfield{volume}%
-  \iffieldundef{number}{}{\mkbibparens{\printfield{number}}}}
+  \iffieldundef{number}{}{\mkbibparens{\printfield[noformat]{number}}}}
   \setunit{\addspace}\newblock
   \usebibmacro{issuename}%
   \newunit}
