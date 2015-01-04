@@ -1,0 +1,220 @@
+\RequireCitationStyle{apa}
+
+
+% 日本語論文の場合，著者名の区切り文字は'・', 英文の場合，中間の区切り文字は ','%
+% 最終区切り文字は'&'%
+\renewcommand{\finalnamedelim}{\iffieldequalstr{textlang}{ja}{\unspace{・}}{\addspace\&\space}}
+\renewcommand{\multinamedelim}{\iffieldequalstr{textlang}{ja}{\unspace{・}}{\addcomma\space}}
+
+
+% 日本語論文の場合，'et al' を'他'に変更
+% 初出の場合は全著者名を表示
+\DeclareNameFormat{labelname}{%
+	\ifthenelse{\value{uniquelist}>1}
+		{\numdef\cbx@min{\value{uniquelist}}}
+		{\numdef\cbx@min{\value{minnames}}}%
+	\ifboolexpr{test {\ifnumcomp{\value{listcount}}{=}{1}}
+			or test {\ifnumcomp{\value{listtotal}}{=}{2}}}
+		{\usebibmacro{labelname:doname}{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}}
+		{\ifboolexpr{test {\ifciteseen}}
+			{\ifnumcomp{\value{listcount}}{<}{\cbx@min + 1}% normal name
+				{\usebibmacro{labelname:doname}{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}}%
+				{}%
+			\ifnumcomp{\value{listcount}}{=}{\cbx@min + 1}
+				{\ifnumcomp{\value{listcount}}{<}{\value{listtotal}}
+					{\iffieldequalstr{textlang}{ja}{他}{\andothersdelim\bibstring{andothers}}}
+					{\usebibmacro{labelname:doname}{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}}}%
+				{}%
+				\ifnumcomp{\value{listcount}}{>}{\cbx@min + 1}% nothing thereafter
+					{\relax}%
+					{}}%
+			{\usebibmacro{labelname:doname}{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}}}}
+
+\DeclareCiteCommand{\nptextcite}
+	{\iffieldequalstr{textlang}{ja}{}
+		{\renewcommand{\finalnamedelim}{\ifnum\value{liststop}>2 \finalandcomma\fi\addspace\&\space}}%
+	\usebibmacro{cite:init}%
+	\usebibmacro{prenote}}
+	{\usebibmacro{citeindex}%
+	\global\booltrue{cbx:np}%
+	\usebibmacro{textcite}%
+	\global\boolfalse{cbx:np}}%
+	{}
+	{\iffieldundef{postnote}
+	{}
+	{\nameyeardelim
+	\printfield{postnote}}%
+	\usebibmacro{cite:post}}
+
+\DeclareCiteCommand{\parencite}[\mkbibparens]
+  {\iffieldequalstr{textlang}{ja}{}
+  {\renewcommand{\finalnamedelim}{\ifnum\value{liststop}>2 \finalandcomma\fi\addspace\&\space}}%
+   \usebibmacro{cite:init}%
+   \usebibmacro{prenote}}
+   {\usebibmacro{citeindex}%
+	 \usebibmacro{cite}}
+  {}
+  {\usebibmacro{postnote}%
+   \usebibmacro{cite:post}}
+
+\DeclareCiteCommand*{\parencite}[\mkbibparens]
+	{\iffieldequalstr{textlang}{ja}{}{
+	 \renewcommand{\finalnamedelim}{\ifnum\value{liststop}>2 \finalandcomma\fi\addspace\&\space}}%
+	 \usebibmacro{cite:init}%
+	 \usebibmacro{prenote}}
+    {\usebibmacro{citeindex}%
+	 \usebibmacro{citeyear}}
+	{}
+	{\usebibmacro{postnote}%
+	 \usebibmacro{cite:post}}
+
+\DeclareCiteCommand{\citeyear}
+  {\boolfalse{citetracker}%
+   \boolfalse{pagetracker}%
+   \usebibmacro{prenote}}
+  {\ifnameundef{translator}
+       {\usebibmacro{cite:plabelyear+extrayear}}%
+       {\usebibmacro{cite:ptlabelyear+translator}}}%
+  {\multinamedelim}
+  {\usebibmacro{postnote}}
+
+%%%%%%%%%%%%%
+\renewbibmacro*{cite:author}{%
+  \iffieldequals{namehash}{\cbx@lasthash}
+% Multiple cites in one command
+   {\setunit{\compcitedelim}%
+    \usebibmacro{cite:plabelyear+extrayear}}%
+% Single cite
+   {\ifthenelse{\ifnameundef{labelname}\OR\iffieldequalstr{entrytype}{patent}}
+% No author/editor
+     {\usebibmacro{cite:noname}%
+       \savefield{namehash}{\cbx@lasthash}}
+% Normal cite
+     {\ifnameundef{shortauthor}
+         {\ifnameundef{translator}
+         {\printnames[labelname][-\value{listtotal}]{labelname}}
+         {\printnames[labelname][-\value{listtotal}]{namec}}}
+        {\cbx@apa@ifnamesaved
+          {\printnames{shortauthor}}
+          {\printnames[labelname][-\value{listtotal}]{author}\addspace\printnames[sabrackets]{shortauthor}}}%
+      \savefield{namehash}{\cbx@lasthash}}}%
+   \setunit{\multicitedelim}}
+
+\renewbibmacro*{textcite}{%
+  \iffieldequals{namehash}{\cbx@lasthash}
+% Compact cite - more than one thing for same author
+    {\setunit{\compcitedelim}%
+     \usebibmacro{cite:plabelyear+extrayear}}
+% New cite
+    {%
+    \ifbool{cbx:parens}
+      {\bibcloseparen\global\boolfalse{cbx:parens}}
+      {}%
+      \setunit{\compcitedelim}%
+      \ifthenelse{\ifnameundef{labelname}\OR\iffieldequalstr{entrytype}{patent}}
+  % No author/editor or patent
+       {\iffieldundef{shorthand}%
+    % Cite using title
+         {\usebibmacro{cite:noname}%
+          \setunit{\ifbool{cbx:np}%
+                   {\nameyeardelim}%
+                   {\global\booltrue{cbx:parens}\addspace\bibopenparen}}%
+          \usebibmacro{cite:plabelyear+extrayear}}
+    % Cite using shorthand
+         {\usebibmacro{cite:shorthand}}}
+  % Normal cite with author/editor
+  % Normal full cite
+       {\ifnameundef{shortauthor}%
+    % Normal full cite
+         {\ifnameundef{translator}
+         {\printnames[labelname][-\value{listtotal}]{labelname}}
+         {\printnames[labelname][-\value{listtotal}]{namec}}}
+    % Cite using short author
+         {\cbx@apa@ifnamesaved
+           {\printnames{shortauthor}}
+           {\printnames[labelname][-\value{listtotal}]{author}}}%
+  % Year
+        \setunit{\ifbool{cbx:np}
+                  {\nameyeardelim}
+                  {\global\booltrue{cbx:parens}\addspace\bibopenparen}}%
+  % Put the shortauthor inside the year brackets if necessary
+        \ifnameundef{shortauthor}
+         {}
+         {\cbx@apa@ifnamesaved
+           {}
+           {\printnames{shortauthor}\setunit{\nameyeardelim}}}%
+  % Actual year printing
+  		\ifnameundef{translator}
+          {\usebibmacro{cite:plabelyear+extrayear}}%
+          {\usebibmacro{cite:ptlabelyear+translator}}%
+  % Save name hash for checks later
+        \savefield{namehash}{\cbx@lasthash}}}}
+
+\renewbibmacro*{labelname:doname}[8]{%
+  \ifcase\value{uniquename}%
+    \ifuseprefix
+      {\usebibmacro{name:last}{#1}{#3}{#5}{}}
+      {\usebibmacro{name:last}{#1}{#3}{}{}}%
+   \or
+    \ifuseprefix
+      {\iffieldequalstr{textlang}{ja}
+      {\usebibmacro{name:seimei}{#1}{#2}{#3}{#4}}
+	{\usebibmacro{name:first-last}{#1}{#4}{#5}{}}}
+      {\usebibmacro{name:first-last}{#1}{#4}{}{}}%
+   \or
+    \ifuseprefix
+      {\usebibmacro{name:first-last}{#1}{#3}{#5}{}}
+      {\usebibmacro{name:first-last}{#1}{#3}{}{}}%
+   \fi
+   \usebibmacro{name:andothers}}
+
+\renewbibmacro*{cite}{%
+  \iffieldequals{namehash}{\cbx@lasthash}
+% Multiple cites in one command
+   {\setunit{\compcitedelim}%
+    \usebibmacro{cite:plabelyear+extrayear}}%
+% Single cite
+   {\ifthenelse{\ifnameundef{labelname}\OR\iffieldequalstr{entrytype}{patent}}
+% No author/editor
+     {\usebibmacro{cite:noname}%
+       \setunit{\nameyeardelim}%
+       \usebibmacro{cite:plabelyear+extrayear}%
+       \savefield{namehash}{\cbx@lasthash}}
+% Normal cite
+     {\ifnameundef{shortauthor}
+        {\ifnameundef{translator}{\printnames[labelname][-\value{listtotal}]{labelname}}
+          {\printnames[labelname][-\value{listtotal}]{namec}}}%
+        {\cbx@apa@ifnamesaved
+          {\printnames{shortauthor}}
+          {\printnames[labelname][-\value{listtotal}]{author}\addspace\printnames[sabrackets]{shortauthor}}}%
+      \setunit{\nameyeardelim}%
+      \ifnameundef{translator}{\usebibmacro{cite:plabelyear+extrayear}}
+        {\usebibmacro{cite:ptlabelyear+translator}}%
+      \savefield{namehash}{\cbx@lasthash}}}%
+   \setunit{\multicitedelim}}
+
+\renewbibmacro*{cite:plabelyear+extrayear}{%
+  \iffieldundef{labelyear}
+    {}
+    {\printtext[bibhyperref]{%
+       \printfield[noformat]{origyear}\setunit*{\addslash}%
+       \printfield{labelyear}\printfield{extrayear}}}%
+}
+
+\newbibmacro*{cite:ptlabelyear+translator}{%
+    \printfield[noformat]{origyear}\addspace%
+    \printnames[labelname][-\value{listtotal}]{translator}\addspace
+    \iffieldundef{translatorrole}{
+      \printtext{訳}\addspace\printfield[noformat]{year}}{%
+      \printfield[noformat]{translatorrole}\addspace\printfield[noformat]{year}}%
+}%
+
+\newbibmacro{name:seimei}[4]{%
+  \ifuseprefix
+    {\usebibmacro{name:delim}{#1}%
+     \usebibmacro{name:hook}{#1}%
+     \ifblank{#3}{#1}{#1\namespace{#1}{#2}{#3}{#4}}}%
+    {\usebibmacro{name:delim}{#1}%
+     \usebibmacro{name:hook}{#1}%
+     \ifblank{#3}{#1}{#1\namespace{#1}{#2}{#3}{#4}}}%
+}

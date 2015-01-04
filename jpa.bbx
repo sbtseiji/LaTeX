@@ -1,0 +1,616 @@
+\ProvidesFile{jpa.bbx}[2015/01/02\space v0.1\space JPA biblatex references style]
+\RequireBiber[3]
+\RequireBibliographyStyle{apa}
+
+
+\setlength{\bibhang}{2em}
+\newcounter{jdatecounter}
+
+\newlength{\NameLen}
+\newlength{\OneChar}
+\settowidth{\OneChar}{あ}
+
+\newcommand{\namespace}[4]{%
+%\ifthenelse{\expandafter\equal{#1\bibinitperiod}{#2}}{　#3}{\ifthenelse{\equal{#3\bibinitperiod}{#4}}{　#3}{\settowidth{\TestDimen}{#1}\the\TestDimen\settowidth{\TestDimen}{あ}\the\TestDimen}}%
+\settowidth{\NameLen}{#1}\ifthenelse{\equal{\the\NameLen}{\the\OneChar}}{　#3}{%
+\settowidth{\NameLen}{#3}\ifthenelse{\equal{\the\NameLen}{\the\OneChar}}{　#3}{#3}}%
+}
+
+\newboolean{jpa:engcite}
+\DeclareBibliographyOption{engcite}{%
+\ifstrequal{#1}{true}
+{\global\booltrue{jpa:engcite}}
+{\global\boolfalse{jpa:engcite}}}
+
+\DeclareDatamodelEntrytypes{jarticle,jbook,jinbook,jmvbook,jreport,jonline,jthesis,jnewsarticle}
+\DeclareDatamodelFields[type=field,datatype=literal]{etitle,ebooktitle,ejournal,origbooktitle,origtitle,textlang,editorrole,translatorrole,epubstate}
+\DeclareDatamodelFields[type=list,datatype=literal]{origpublisher}
+
+\DefineBibliographyExtras{american}{%
+  \protected\def\mkbibdateapalong#1#2#3{%
+    \iffieldundef{#1}{}{\iffieldbibstring{#1}{\biblcstring{\thefield{#1}}}{\thefield{#1}}}%
+    \iffieldundef{#2}{}{\iffieldundef{#1}{}{\addcomma\addspace}\mkbibmonth{\thefield{#2}}}%
+    \iffieldundef{#3}{}{\ifthenelse{\iffieldundef{#2}\OR\iffieldundef{#1}}{}{\addspace}\stripzeros{\thefield{#3}}}}%
+  \protected\def\mkbibdateapalongextra#1#2#3{%
+    \iffieldundef{#1}{}{\iffieldbibstring{#1}{\biblcstring{\thefield{#1}}}{\thefield{#1}}\printfield{extrayear}}%
+    \iffieldundef{#2}{}{\iffieldundef{#1}{}{\addcomma\addspace}\mkbibmonth{\thefield{#2}}}%
+    \iffieldundef{#3}{}{\ifthenelse{\iffieldundef{#2}\OR\iffieldundef{#1}}{}{\addspace}\stripzeros{\thefield{#3}}}}%
+  \protected\def\mkbibdateapalongmdy#1#2#3{%
+    \iffieldundef{#2}{}{\mkbibmonth{\thefield{#2}}}%
+    \iffieldundef{#3}{}{\addspace}\stripzeros{\thefield{#3}}%
+    \iffieldundef{#1}{}{\ifthenelse{\iffieldundef{#3}}{\ifthenelse{\iffieldundef{#2}}{}{\addspace}}{\addcomma\addspace}%
+       \iffieldbibstring{#1}{\biblcstring{\thefield{#1}}}{\thefield{#1}}}}}
+
+\DeclareSourcemap{
+  \maps[datatype=bibtex]{
+    \map[overwrite]{
+      \pertype{jarticle}
+      \pertype{jbook}
+      \pertype{jinbook}
+      \pertype{jmvbook}
+      \pertype{jreport}
+      \pertype{jonline}
+      \pertype{jthesis}
+      \pertype{jnewsarticle}
+      \step[fieldsource=eauthor,fieldtarget=namea]
+      \step[fieldsource=eeditor,fieldtarget=nameb]
+      \step[fieldsource=origauthor,fieldtarget=namec]
+      \step[fieldsource=epublisher,fieldtarget=lista]
+      \step[fieldset = textlang, fieldvalue=ja]
+    }
+    \map{
+      \step[fieldsource=namec, final]
+      \step[fieldset = sortname, origfieldval]
+    }
+  }
+}
+
+\DeclareSortingScheme{apa}{
+  \sort{
+    \field{presort}
+  }
+  \sort[final]{
+    \field{sortkey}
+  }
+  \sort{
+    \field{sortname}
+    \field{namea}% eauthorフィールド
+    \field{author}
+    \field{editor}
+    \field{translator}
+    \field{writer}
+    \field{director}
+    \field{producer}
+    \field{execproducer}
+    \field{origauthor}
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field{sortyear}
+    \field{year}
+    \field{pubstate}
+  }
+  \sort{
+    \field{sorttitle}
+    \field{title}
+  }
+  \sort{
+    \field[padside=left,padwidth=4,padchar=0]{volume}
+    \literal{0000}
+  }
+}
+
+
+\newcommand\bibopenpparen{(}
+\newcommand\bibclosepparen{)}
+
+%%%%%%%%%%%%%
+\DeclareNameFormat{jpaauthor}{%
+  \renewcommand{\finalnamedelim}{\unspace{・}}
+  \ifblank{#3}
+    {\usebibmacro{name:jpa}{#1}{#2}{}{}{}}%
+	{\usebibmacro{name:jpa}{#1}{#2}{#3}{#4}{}}
+}
+\DeclareNameFormat{jpaeauthor}{%
+  \renewcommand{\finalnamedelim}{\unspace{・}}
+  \usebibmacro{name:apa:last-first}{#1}{#2}{#3}{}{}%
+}
+\DeclareFieldFormat{titleaddon}{\mkbibparens{#1}}
+\DeclareFieldFormat[article]{volume}{\mkbibbold{\apanum{#1}}}
+\DeclareFieldFormat[jarticle]{volume}{\mkbibbold{\apanum{#1}}}
+\DeclareFieldFormat[jarticle]{title}{#1　\unspace}
+\DeclareFieldFormat[jreport]{title}{#1　\unspace}
+\DeclareFieldFormat[jthesis]{title}{#1　\unspace}
+\DeclareFieldFormat[jonline]{title}{#1　\unspace}
+\DeclareFieldFormat[jarticle]{journaltitle}{\unspace#1}
+\DeclareFieldFormat[jarticle]{pages}{#1}
+\DeclareFieldFormat[jarticle]{ejournal}{\mkbibemph{#1}}
+\DeclareFieldFormat[jbook]{btitle}{\textit{#1}}
+\DeclareFieldFormat[jmvbook]{jvol}{#1{巻}}
+\DeclareFieldFormat{jdate}{\setcounter{jdatecounter}{#1}\thejdatecounter}
+\DeclareFieldFormat{pyearorunkyear}{%
+  \ifthenelse{\iffieldequalstr{doubtfuldate}{true}}
+    {\mkbibbrackets{ca\adddot\addspace#1}}
+    {\printtext{\bibopenpparen}{#1}\printtext{\bibclosepparen}}}
+
+\DeclareBibliographyDriver{jarticle}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{jauthor/editor}%
+  \setunit{\labelnamepunct}\newblock
+  \printfield[noformat]{title}\unspace{　}%
+  \iffieldundef{journaltitle}{\usebibmacro{issuetitle}}
+  {\newblock\usebibmacro{journal+issuetitle}}
+  \iffieldundef{pages}{\renewcommand*{\finentrypunct}{\relax}\usebibmacro{finentry}}{
+  \setunit{\bibpagespunct}
+  \printfield{pages}\adddot}%
+  \ifthenelse{\ifnameundef{namea}\OR\NOT\boolean{jpa:engcite}}{}
+  {\newline%
+  \iffieldundef{etitle}%
+  {\mkbibparens{\usebibmacro{eauthor-only}}}% 
+  {\mkbibparens{\usebibmacro{eauthor}% 
+    \newunit\newblock%
+    \usebibmacro{etitle}%
+    \newunit\newblock%
+    \usebibmacro{ejournal+issuetitle}%
+    \setunit{\bibpagespunct}%
+    \printfield{pages}\adddot}
+    }}
+  \renewcommand*{\finentrypunct}{\relax}\usebibmacro{finentry}
+  }
+
+\DeclareBibliographyDriver{jnewsarticle}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{jauthor/editor}%
+  \setunit{\labelnamepunct}\newblock
+  \printfield[noformat]{title}\unspace{　}%
+  \iffieldundef{journaltitle}{\usebibmacro{issuetitle}}
+  {\newblock\usebibmacro{journal+issuetitle}}
+  \renewcommand*{\finentrypunct}{\relax}\usebibmacro{finentry}}
+
+\DeclareBibliographyDriver{jbook}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \ifnameundef{namec}
+  {\usebibmacro{jauthor/editor}
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{jchapter}
+  \unspace\printtext{　}
+  \printlist{publisher}}
+  {\usebibmacro{origauthor}
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{origbooktitle}
+  \printlist{location}\addcolon\addspace\printlist{origpublisher}\adddot
+  \newline
+  \mkbibparens{\usebibmacro{tauthor}
+  \usebibmacro{translator}
+  \printfield[noformat]{title}
+  \unspace\printtext{　}
+  \printlist{publisher}}
+  }
+  \ifthenelse{\ifnameundef{namea}\OR\NOT\boolean{jpa:engcite}}{}
+  {\newline
+  \iffieldundef{etitle}
+  {\mkbibparens{\usebibmacro{eauthor-only}}}% 
+  {\mkbibparens{\usebibmacro{eauthor}% 
+    \newunit\newblock%
+    \usebibmacro{echapter}%
+    \newunit\newblock%
+    \printlist{location}\addcolon\addspace\printlist{lista}\adddot}
+    }
+}
+\renewcommand*{\finentrypunct}{\relax}\usebibmacro{finentry}}
+
+\DeclareBibliographyDriver{jinbook}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{jauthor/editor}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{jchapter}
+  \unspace\printtext{　}
+  \usebibmacro{jeditor}
+  \usebibmacro{jbooktitle}
+  \unspace\printtext{　}
+  \printlist{publisher}
+  \unspace\printtext{　}
+  \printfield{pages}\adddot%
+  \ifthenelse{\ifnameundef{namea}\OR\NOT\boolean{jpa:engcite}}{}
+  {\newline
+  \iffieldundef{etitle}
+  {\mkbibparens{\usebibmacro{eauthor-only}}}% 
+    {\mkbibparens{\usebibmacro{eauthor}% 
+    \newunit\newblock%
+    \usebibmacro{ebooktitle}%
+    \newunit\newblock%
+    \printlist{location}\addcolon\addspace\printlist{lista}\adddot}
+    }
+}
+\renewcommand*{\finentrypunct}{\relax}\usebibmacro{finentry}}
+
+\DeclareBibliographyDriver{jmvbook}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{jauthor/editor}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{jchapter}
+  \unspace\printtext{　}
+  \printlist{publisher}
+  \unspace\printtext{　}
+  \printfield[jvol]{volumes}
+  \ifthenelse{\ifnameundef{namea}\OR\NOT\boolean{jpa:engcite}}{}
+  {\newline
+  \iffieldundef{etitle}
+  {\mkbibparens{\usebibmacro{eauthor-only}}}% 
+  {\mkbibparens{\usebibmacro{eauthor}% 
+    \newunit\newblock%
+    \usebibmacro{echapter}%
+    \newunit\newblock%
+    \printlist{location}\addcolon\addspace\printlist{lista}\adddot}
+    }
+}
+\renewcommand*{\finentrypunct}{\relax}\usebibmacro{finentry}}
+
+\DeclareBibliographyDriver{inbook}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{author}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}%
+  \ifthenelse{\NOT\iffieldundef{title}\OR\boolean{bbx:titleinauthpos}}{\newunit}{\setunit{\addspace}}\newblock
+  \usebibmacro{editor+trans}%
+  \newblock
+  \usebibmacro{maintitle+booktitle}%
+  \adddot\newblock
+  \usebibmacro{addinfo}%
+  \newunit\newblock
+  \printfield{series}%
+  \newunit\newblock
+  \printfield{note}%
+  \newunit\newblock
+  \usebibmacro{location+publisher}%
+  \addcomma\addspace
+  \usebibmacro{doi+eprint+url}%
+  \setunit*{\addspace}\newblock
+  \usebibmacro{origyear}%
+  \newunit\newblock
+  \printfield{addendum}%
+  \newunit\newblock
+  \iftoggle{bbx:related}
+    {\usebibmacro{related:init}%
+     \usebibmacro{related}}
+    {}%
+  \printfield{pages}%
+  \usebibmacro{apa:pageref}%
+  \usebibmacro{apa:finpunct}%
+  \usebibmacro{finentry}}
+
+\renewbibmacro*{addinfo}{%
+  \ifthenelse{\iffieldundef{edition}\AND%
+              \iffieldundef{chapter}\AND%
+              \iffieldundef{volumes}\AND%
+              \iffieldundef{number}\AND%
+              \(\iffieldundef{volume}\OR\boolean{bbx:volseen}\)}
+  {}
+  {%
+   \printfield{edition}%
+   \setunit*{\addcomma\addspace}%
+   \printfield{chapter}%
+   \setunit*{\addcomma\addspace}%
+   \notbool{bbx:volseen}%
+     {\iffieldundef{volume}{}{\global\booltrue{bbx:volseen}}%
+      \printfield{volume}%
+      \iffieldundef{part}{}{\printfield{part}}}{}%
+   \setunit*{\addcomma\addspace}%
+   \printfield{number}%
+   \setunit*{\addcomma\addspace}%
+   \printfield{volumes}%
+   \setunit{}%
+   \newunit}\renewcommand*{\finentrypunct}{\relax}\usebibmacro{finentry}}
+
+\DeclareBibliographyDriver{jreport}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{jauthor/editor}%
+  \setunit{\labelnamepunct}\newblock
+  \printfield[title]{title}%
+  \unspace\printlist{institution}%
+  \usebibmacro{apa:pageref}%
+  \usebibmacro{apa:finpunct}%
+  }
+
+\DeclareBibliographyDriver{jthesis}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{jauthor}%
+  \setunit{\labelnamepunct}\newblock
+  \printfield[title]{title}%
+  \unspace\printlist{institution}%
+  \printfield{type}\unspace%
+  \usebibmacro{finentry}}
+
+\DeclareBibliographyDriver{jonline}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{jauthor}%
+  \setunit{\labelnamepunct}\newblock
+  \printfield[noformat]{title}\unspace{　}
+  \printlist{organization}
+  \usebibmacro{jurl+urldate}%
+}
+
+\DeclareBibliographyDriver{online}{%
+  \usebibmacro{bibindex}%
+  \usebibmacro{begentry}%
+  \usebibmacro{jauthor}%
+  \setunit{\labelnamepunct}\newblock
+  \usebibmacro{title}{\newunit}%
+  \printlist{organization}
+  \usebibmacro{eurl+urldate}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%
+
+\renewbibmacro*{title}{%
+  \ifthenelse{\iffieldundef{title}\AND\iffieldundef{subtitle}}
+    {}
+    {\iffieldundef{origtitle}
+      {\printtext[title]{%
+        \printfield[apacase]{title}%
+        \setunit{\subtitlepunct}%
+        \printfield[apacase]{subtitle}}}
+      {\printfield{origtitle}%
+       \setunit{\addspace}%
+       \printtext[brackets]{%
+        \printfield[apacase]{title}%
+        \setunit{\subtitlepunct}%
+        \printfield[apacase]{subtitle}}}%
+     \setunit{\addspace}%
+     \iffieldundef{titleaddon}{}%
+     {\unspace\adddot\addspace\printfield{titleaddon}}%
+     \iffieldequalstr{entrytype}{book}%
+       {\setunit{\addspace}\usebibmacro{bookaddinfo}}%
+       {}%
+     \ifthenelse{%
+       \ifnameundef{author}\AND%
+       \(\ifnameundef{editor}\AND\NOT\boolean{bbx:editorinauthpos}\)\AND%
+       \ifnameundef{producer}\AND%
+       \ifnameundef{director}\AND%
+       \ifnameundef{writer}}
+        {\newunit\newblock
+         \usebibmacro{labelyear+extrayear}}
+        {}}}
+
+\newbibmacro{jurl+urldate}{%
+\unspace\printtext{ <}%
+\printfield{url}
+\unspace\printtext{> }%
+\iffieldundef{urlyear}{}{
+\bibopenparen
+\printfield{urlyear}年\printfield[jdate]{urlmonth}月\printfield[jdate]{urlday}日
+\bibcloseparen
+}
+}
+
+\newbibmacro{eurl+urldate}{%
+\unspace\printtext{ <}%
+\printfield{url}
+\unspace\printtext{> }%
+\bibopenparen
+\printurldate
+\bibcloseparen
+}
+
+
+\newbibmacro{jbooktitle}{%
+		\iffieldundef{booktitle}{%
+			\iffieldundef{series}{}{\printfield[noformat]{series}}%
+		}{\printfield[noformat]{booktitle}}%
+}%
+
+\newbibmacro{jchapter}{%
+	\iffieldundef{title}{%
+		\iffieldundef{booktitle}{%
+			\iffieldundef{series}{}{\printfield[noformat]{series}}%
+		}{\printfield[noformat]{booktitle}}%
+	}{\printfield[noformat]{title}}%
+	\iffieldundef{edition}{}
+	{\unspace{　}\printfield[noformat]{edition}}
+}%
+
+
+\newbibmacro{ebooktitle}{%
+		\iffieldundef{ebooktitle}{%
+			\iffieldundef{userf}{}{\printfield[btitle]{userf}}%
+		}{\printfield[btitle]{ebooktitle}}%
+}%
+
+\newbibmacro{origbooktitle}{%
+		\iffieldundef{origbooktitle}{\printfield[btitle]{origtitle}}{\printfield[btitle]{origbooktitle}}\adddot\addspace%
+		\iffieldundef{edition}{}{\printfield[noformat]{edition}\isdot\adddot\addspace}%
+}%
+
+\newbibmacro{echapter}{%
+	\iffieldundef{etitle}{%
+		\iffieldundef{ebooktitle}{%
+			\iffieldundef{userf}{}{\printfield[btitle]{userf}}%
+		}{\printfield[btitle]{ebooktitle}}%
+	}{\printfield[btitle]{etitle}}%
+}%
+
+\newbibmacro{eauthor}{%
+\renewcommand{\multinamedelim}{\ifthenelse{\value{liststop}>2}{\addcomma\addspace}{\addspace\&\space}}%
+\ifnameundef{namea}{}%
+{\printnames[apaauthor][-\value{listtotal}]{namea}%
+\newunit\newblock%
+\usebibmacro{labelyear+extrayear-in-paren}}%
+}
+
+\newbibmacro{eauthor-only}{%
+  \ifnameundef{namea}
+    {}
+    {\renewcommand{\multinamedelim}{\ifthenelse{\value{liststop}>2}{\addcomma\addspace}{\addspace\&\space}}%
+\printnames[apaauthor][-\value{listtotal}]{namea}%
+    }}
+
+\newbibmacro{jauthor}{%
+\renewcommand{\multinamedelim}{\unspace{・}}
+  \ifnameundef{author}
+    {\usebibmacro{labeltitle}}
+    {\printnames[jpaauthor][-\value{listtotal}]{author}}%
+  \usebibmacro{labelyear+extrayear}}
+
+\newbibmacro{tauthor}{%
+\printnames[jpaeauthor][-\value{listtotal}]{author}
+}
+
+\renewbibmacro{translator}{%
+\renewcommand{\multinamedelim}{\unspace{・}}
+\printnames[jpaauthor][-\value{listtotal}]{translator}%
+\iffieldundef{translatorrole}
+  {\printtext{\bibopenpparen}\printtext{訳}\printtext{\bibclosepparen}}
+  {\printtext{\bibopenpparen}\printfield[noformat]{translatorrole}\printtext{\bibclosepparen}}
+\usebibmacro{labelyear+extrayear-in-paren}\adddot\addspace}
+
+\newbibmacro{jeditor}{%
+\renewcommand{\multinamedelim}{\unspace{・}}
+  \ifnameundef{editor}{}{
+    \printnames[jpaauthor][-\value{listtotal}]{editor}
+    \iffieldundef{editorrole}{%
+      \printtext[parens]{編}}{%
+      \printtext[parens]{\printfield[noformat]{editorrole}}
+    }}
+}
+
+\newbibmacro{jauthor/editor}{%
+  \ifnameundef{author}
+    {\ifnameundef{editor}
+      {}
+      {\usebibmacro{jeditorinauthpos}}}
+    {\global\boolfalse{bbx:editorinauthpos}%
+     \usebibmacro{jauthor}}}
+
+\newbibmacro{jeditorinauthpos}{%
+    \global\booltrue{bbx:editorinauthpos}%
+    \printnames[jpaauthor][-\value{listtotal}]{editor}%
+    \setunit{\addspace}%
+    \ifnameundef{editor}
+      {}
+      {\iffieldundef{editorrole}{
+        \printtext[parens]{編}}{
+        \printtext[parens]{\printfield[noformat]{editorrole}}}
+      %
+       \clearname{editor}%
+       \setunit{\addspace}%
+       \usebibmacro{labelyear+extrayear}%
+       \setunit{\adddot\addspace}}}
+
+\newbibmacro{name:jpa}[5]{%
+	\usebibmacro{name:delim}{#1}%
+	\usebibmacro{name:hook}{#1}%
+	\mkbibnamelast{#1}%
+	\ifblank{#3}{}{\namespace{#1}{#2}{#3}{#4}}\unspace\ifblank{#5}{}{\mkbibparen{#5}}}% ここ
+
+\newbibmacro{name:ejpa}[4]{%
+	\usebibmacro{name:delim}{#1}%
+	\usebibmacro{name:hook}{#1}%
+	\mkbibnamelast{#1\isdot}%
+	\ifblank{#3}{}{\addcomma\addspace\mkbibnamefirst{#3}}%
+}
+
+\newbibmacro*{labelyear+extrayear-in-paren}{%
+  \iffieldundef{labelyear}
+    {\iffieldundef{origyear}
+      {}
+      {\printtext[yearorunkyear]{\printfield[noformat]{origyear}}}}%
+    {\iffieldundef{epubstate}{\printtext[pyearorunkyear]{\printdateextralabel}}%
+    {\printfield[pyearorunkyear]{epubstate}}}}
+
+
+\newbibmacro{etitle}{%
+  \ifthenelse{\iffieldundef{etitle}}
+    {}
+    {\printtext[etitle]{%
+      \printfield[apacase]{etitle}%
+      \setunit{\subtitlepunct}%
+      \printfield[apacase]{subtitle}}}
+     \setunit{\addspace}%
+     \printfield{titleaddon}%
+     \ifthenelse{%
+       \ifnameundef{author}\AND%
+       \(\ifnameundef{editor}\AND\NOT\boolean{bbx:editorinauthpos}\)\AND%
+       \ifnameundef{producer}\AND%
+       \ifnameundef{director}\AND%
+       \ifnameundef{writer}}
+        {\newunit\newblock
+         \usebibmacro{labelyear+extrayear}}
+        {}}
+
+\renewbibmacro*{journal+issuetitle}{%
+  \iffieldequalstr{entrytype}{jarticle}{
+  	\usebibmacro{jjournal}\newunit}%
+  	{\usebibmacro{journal}}%
+  \iffieldundef{series}
+    {}
+    {\setunit*{\addcomma\addspace}%
+	\newunit
+     \printfield{series}
+     \setunit{\addcomma\space}}%
+  \iffieldundef{volume}
+  {\iffieldundef{number}{}
+  {\addcomma\addspace\printtext[noformat]{No.\printfield{number}}}}
+  {\setunit{\addcomma\addspace}\printfield{volume}%
+  \iffieldundef{number}{}{\mkbibparens{\printfield{number}}}}
+  \setunit{\addspace}\newblock
+  \usebibmacro{issuename}%
+  \newunit}
+
+\newbibmacro{issuetitle}{%
+\iffieldundef{issuetitle}{}{
+\unspace\printfield{issuetitle}\printtext{　}}
+\iffieldundef{issue}{}{\printfield{issue}}
+}
+
+\newbibmacro{ejournal+issuetitle}{%
+  \usebibmacro{ejournal}%
+  \setunit*{\addcomma\addspace}%
+  \iffieldundef{series}
+    {}
+    {\newunit
+     \printfield{series}
+     \setunit{\addcomma\space}}%
+  \printfield{volume}%
+  \printfield{number}%
+  \setunit{\addspace}\newblock
+  \usebibmacro{issuename}%
+  \newunit}
+
+\newbibmacro{jjournal}{%
+\printfield[noformat]{journaltitle}%
+}
+
+\newbibmacro{ejournal}{%
+  \printtext[ejournal]{%
+  \printfield[titlecase]{ejournal}%
+  \setunit{\subtitlepunct}%
+  \printfield[titlecase]{journalsubtitle}}
+}
+
+\newbibmacro{origauthor}{%
+\printnames[apaauthor][-\value{listtotal}]{namec}%
+     \setunit*{\addspace}%
+     \printfield{nameaddon}%
+     \ifnameundef{with}
+       {}
+       {\setunit{}\addspace\mkbibparens{\printtext{\bibstring{with}\addspace}%
+        \printnames[apaauthor][-\value{listtotal}]{with}}
+        \setunit*{\addspace}}
+  \newunit\newblock%
+  \usebibmacro{origyear}}
+
+\renewbibmacro{origyear}{%
+\iffieldundef{origyear}
+{}
+{\printtext[yearorunkyear]{\printfield[noformat]{origyear}}}}%
+

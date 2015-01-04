@@ -1,0 +1,1205 @@
+\documentclass[12pt]{ltjsarticle}
+\usepackage{luatexja-fontspec}
+\usepackage[top=2.5cm, bottom=2.5cm, left=3cm, right=3cm]{geometry}
+\usepackage{setspace}
+\usepackage{dtklogos}
+\usepackage{url}
+\usepackage[backend=biber,engcite=true,style=jpa]{biblatex}
+\usepackage{csquotes}
+\usepackage[american]{babel}
+
+
+\setmainjfont[BoldFont=HiraKakuPro-W6.otf]{HiraMinPro-W3.otf}
+
+
+\title{Bib{\LaTeX}用 『心理学研究』文献スタイル}
+\author{芝田 征司}
+\date{\today}
+
+\addbibresource{./bibliography.bib}
+
+\begin{document}
+
+\maketitle
+
+
+\section{はじめに}
+\subsection{\texttt{jpa}パッケージについて}
+このパッケージは，Bib{\LaTeX}で『心理学研究』スタイルの引用文献処理を行うためのものです。\texttt{jpa}パッケージは\texttt{jpa.cbx}ファイル（文中引用スタイル）と\texttt{jpa.bbx}ファイル（文献リストスタイル）の2つのファイルで構成されています。
+
+\subsection{依存パッケージ}
+\texttt{jpa}パッケージは，\texttt{biblatex-apa}パッケージ(ver. 6.5)に『心理学研究』用の処理を追加する形で作成されています。そのため，\texttt{jpa}パッケージを利用するためには\texttt{biblatex-apa}パッケージが動作する環境が整っている必要があります。
+
+また，このパッケージはLua{\LaTeX}-jaの使用を前提として作成しています。そのため，p{\LaTeX}などのシステムでは正しく動作しない可能性があります。
+
+\subsection{作成の経緯}
+これまで，{\LaTeX}で日本語を使用する際には，p{\LaTeX}およびその派生型を使用してきました。しかし，フォントの扱いがより簡単である，海外で作成された拡張パッケージのほとんどがそのまま使用できる，Lua{\LaTeX}-jaのおかげで横書き文書の日本語組版が十分実用的なものになったという理由から，最近ではもっぱらpdf{\TeX}系のLua{\LaTeX}を中心的に利用しています。
+
+その際，引用文献の処理にはp{\BibTeX}ではなく{\BibLaTeX}を使用することが多くなりました。{\BibLaTeX}用には\texttt{biblatex-apa}というスタイルファイルがあり，英語論文の場合このスタイルを使用すればAPA形式の文献リストを非常に簡単に作成することが出来ます。しかし，日本語用にそうしたスタイルファイルは用意されていません。
+
+日本語の心理学系学術誌では，ほとんどの場合『心理学研究』の文献スタイルが採用されていますが，このスタイルもいろいろと細かな指定が多く，適切な書式の文献リストを作成するには結構な手間がかかります。そこで，文献リスト作成の手間を少しでも減らせないかと，既存の\texttt{biblatex-apa}スタイルに手を加えて日本語論文用スタイルファイルを作成することにしました。
+
+\subsection{注意事項}
+この\texttt{jpa}パッケージは，作者の使用の範囲で「\textbf{とりあえず動く}」程度にしか動作確認をしていません。使用状況によってさまざまな不具合の生じる可能性があります。また，将来的に，\texttt{biblatex-apa}の仕様変更などによって動作しなくなる場合もあります。このパッケージは作者が個人的に使用する目的で作成したもので，これら不具合や仕様変更などへの対応については保証いたしません。また，このパッケージの使用によって何らかの問題が生じたとしても，作者はその責任を負いかねます。
+
+
+\section{使用方法}
+このパッケージを使用するためには，\texttt{jpa.cbx}と\texttt{jpa.bbx}の２つのファイルを{\TeX}が認識できる場所（\texttt{texmf}以下の適切なディレクトリや作業ディレクトリ内など）においておく必要があります。
+
+\subsection{スタイルの使用}
+スタイルの使用にあたっては，プレアンブルに以下のように記述します。
+
+\begin{quote}
+\begin{verbatim}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=jpa]{biblatex}
+\end{verbatim}
+\end{quote}
+
+
+\texttt{babel}の言語指定に\texttt{american}を使用していますが，これは\texttt{babel}や{\BibLaTeX}には\texttt{japanese}という言語設定が用意されていないためです。また，一部の文献ではリストに日付を記載する必要がありますが，その文献が海外のものである場合，『心理学研究』のフォーマットでは，日付の書式に米式（Jan. 1st, 2015 など）を使用することになっています。
+
+なお，\texttt{jpa}パッケージのもととなる\texttt{biblatex-apa}パッケージでは，\texttt{babel}の他に\texttt{polyglossia}を使用することも可能なようですが，本パッケージでは\texttt{polyglossia}による動作確認は行っていません。
+
+\subsection{オプション}
+
+\subsubsection{英文表記の付加}
+『心理学研究』の引用スタイルでは，日本語文献にはできる限り英文表記を付けることが推奨されています。しかし，雑誌によっては英文表記を必要としないものもあります。こうした雑誌ごとの違いに対応するために，本パッケージでは英文表記の有無を\texttt{engcite}オプションで指定することができます。
+
+このオプションが\texttt{true}の場合，\texttt{eauthor}フィールドに著者名の英文表記情報が入力されている文献については文献情報の最後に英文表記を付加します。ただし，\texttt{engcite}オプションが指定されていても，\texttt{eauthor}フィールドが入力されていない文献情報については英文表記を行いません。
+
+\begin{quote}
+\textbf{日本語文献に英文表記を付加する場合}
+\begin{verbatim}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[backend=biber,engcite=true,style=jpa]
+  {biblatex}
+\end{verbatim}
+\end{quote}
+
+\texttt{engcite}オプションが指定されていない場合，または\texttt{engcite}オプションが\texttt{false}の場合，\texttt{eauthor}フィールドへの入力の有無にかかわらず英文表記は行いません。
+
+\begin{quote}
+\textbf{日本語文献に英文表記を付加しない場合}
+\begin{verbatim}
+\usepackage[american]{babel}
+\usepackage{csquotes}
+\usepackage[backend=biber,engcite=false,style=jpa]
+  {biblatex}
+\end{verbatim}
+\end{quote}
+
+
+\subsubsection{その他のオプション}
+本パッケージは\texttt{biblatex-apa}パッケージを元にしていますので，\texttt{biblatex-apa}で使用可能なオプションは基本的にそのまま使用できます。\texttt{biblatex-apa}で使用可能なオプションについては，\texttt{biblatex-apa}のマニュアル\footnote{\url{http://www.ctan.org/tex-archive/macros/latex/exptl/biblatex-contrib/biblatex-apa/}}を参照してください。
+
+\subsection{文献リストの作成}
+文献リストを作成するには，リストを挿入したい箇所に
+\begin{quote}
+  \texttt{\textbackslash{printbibliography[title=引用文献]}}
+\end{quote}
+と記述します。「引用文献」でなく「参考文献」としたい場合には，\texttt{[title=参考文献]}としてください。
+
+\section{引用コマンド}
+本文中に使用できる引用コマンドは\texttt{biblatex-apa}と同じです。\texttt{biblatex-apa}で使用できる基本的なコマンドには以下のものがあります。
+
+\begin{description}
+  \item[\texttt{\textbackslash textcite}]
+  本文中に文章として引用する。表示される形式は，「著者名(出版年)」。\\
+  例）\texttt{\textbackslash textcite\{Minami1980\}は...}　→　\textcite{Minami1980}は...
+  
+  \item[\texttt{\textbackslash parecite}]
+  括弧内に文献を示す。表示される形式は，「著者名, 出版年」。\\
+  例）\texttt{\textbackslash parencite\{Osaka2004\}}　→　\parencite{Osaka2004}\\
+  　　\texttt{\textbackslash parencite\{Paivio1971,Ekman1992\}}\\
+  　　　　→　\parencite{Paivio1971,Ekman1992}
+
+  \item[\texttt{\textbackslash nptextcite}]
+  括弧内の引用スタイルで括弧を表示しない。\\
+  例）\texttt{\textbackslash nptextcite\{Yasuda1977\}}　→　\nptextcite{Yasuda1977}
+
+  \item[\texttt{\textbackslash citeauthor}]
+  著者名のみを表示する。\\
+  例）\texttt{\textbackslash citeauthor\{Moroi1987\}}　→　\citeauthor{Moroi1987}
+
+  \item[\texttt{\textbackslash citeyear}]
+  出版年のみを表示する。\\
+  例）\texttt{\textbackslash citeyear\{Kusumi1994\}}　→　\citeyear{Kusumi1994}
+\end{description}
+
+
+\section{文献ファイル}
+\subsection{文献タイプ}
+\texttt{jpa}パッケージでは，\texttt{biblatex-apa}で使用される文献タイプ以外に，以下の日本語用文献タイプを追加しています。
+
+\begin{description}
+  \item[jarticle]日本語論文，論文集など
+  \item[jbook]日本語書籍，翻訳書など
+  \item[jinbook]章など日本語書籍中の一部
+  \item[jmvbook]数巻にわたる日本語書籍
+  \item[jreport]年報など
+  \item[jthesis]博士論文など学位論文
+  \item[jonline]オンライン資料
+  \item[jnewsarticle]新聞記事
+\end{description}
+
+\subsection{入力フィールド}
+
+\subsubsection{日本語論文のエントリ}
+
+日本語論文のエントリ・レコードには，以下の追加入力フィールドを使用します。
+\begin{description}
+\item[eauthor] 著者名のローマ字表記。入力の規則は\texttt{author}フィールドに準じる。このフィールドが入力されている場合，文献リスト中では日本語での文献情報に続けて論文の英文表記を行う。
+
+\item[etitle] 論文タイトルの英文表記。入力の規則は\texttt{title}フィールドに準じる。日本語での文献情報に続けて論文の英文表記を行う際に，論文の英訳タイトルとして使用される。
+
+\item[ejournal] 掲載雑誌の英文表記。入力の規則は\texttt{journal}フィールドに準じる。日本語での文献情報に続けて論文の英文表記を行う際に，英文雑誌名として使用される。
+
+\item[epubstate] 出版状況の英文表記。入力の規則は\texttt{pubstate}フィールドに準じる。日本語での文献情報に続けて論文の英文表記を行う際に，（印刷中）のかわりに使用される。
+\end{description}
+
+文献リストの作成時，\texttt{jarticle}レコードは\texttt{sortname}，\texttt{eauthor}，\texttt{author}の優先順で並べ替えられます。日本語論文を文献リストの正しい位置に並べるためには，\texttt{sortname}，\texttt{eauthor}のいずれかが入力されている必要があります。
+
+
+\paragraph{論文のエントリ・レコード例1}
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Kusumi1994,
+  author={{楠見}, {孝}},
+  title={比喩理解における主題の意味変化
+   ---構成語間の相互作用の検討---},
+  journal={心理学研究},
+  year={1994},
+  volume={65},
+  pages={197--205},
+  eauthor={Kusumi, T.},
+  etitle={Semantic change of topic in metaphor 
+   comprehension: {I}nteraction of constituent words},
+  ejournal={Japanese Journal of Psychology},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Kusumi1994}によれば...。...である\parencite{Kusumi1994}。
+\end{quote}
+
+
+文献リストの表示
+
+\begin{quote}
+\begin{description}
+  \item[\textrm{楠見 孝 (1994).}]比喩理解における主題の意味変化 ---構成語間の相互作用の検討---　心理学研究, \textbf{65}, 197--205.\\
+(Kusumi, T. (1994). Semantic change of topic in metaphor comprehension: interaction of constituent words. \textit{Japanese Journal of Psychology}, \textbf{65}, 197--205.)
+\end{description}
+\end{quote}
+
+なお，エントリ中で名前がそれぞれ\{ \}で囲んであるのは，\texttt{biber}がマルチバイト文字を含む著者名を正しく処理できない場合があるためです。ほとんどの場合，\{ \}がなくても問題ありませんが，\{ \}をつけずに\texttt{biber}を実行して次のメッセージが表示された場合，その著者名はリスト中に表示されませんので注意してください。
+
+\begin{quotation}
+  Couldn't determine Last Name for name "***, ***" - ignoring name
+\end{quotation}
+
+\paragraph{論文のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Ogawa2000,
+  author={{小川},{時洋} and {門地},{里絵} and {菊谷},
+    {麻美} and {鈴木},{直人}},
+  title={一般感情尺度の作成},
+  journal={心理学研究},
+  volume={71},
+  pages={241-246},
+  year={2000},
+  eauthor={Ogawa, T. and Monchi, R. and Kikuya, M. and 
+    Suzuki, N.},
+  etitle={Development of the General Affect Scales},
+  ejournal={Japanese Journal of Psychology},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Ogawa2000}によれば...。...である\parencite{Ogawa2000}。
+\end{quote}
+
+
+文献リストの表示
+
+\begin{quote}
+\begin{description}
+  \item[\textrm{小川時洋・門地里絵・菊谷麻美・鈴木直人 (2000).}] 一般感情尺度の作成　心理学研究, \textbf{71}, 241--246.\\
+(Ogawa, T., Monchi, R., Kikuya, M., \& Suzuki, N. (2000). Development of the general affect scales. \textit{Japanese Journal of Psychology}, \textbf{71}, 241--246.)\end{description}
+\end{quote}
+
+
+\paragraph{論文のエントリ・レコード例3}
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Yagi2004,
+  author={{八木}, {善彦} and {菊地}, {正}},
+  year={2004},
+  title={ストループ様課題を用いた注意の負荷理論の検討},
+  journal={心理学研究},
+  volume={74},
+  pages={131--139},
+  sortname={Yagi, Y. and Kikuchi}
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Yagi2004}によれば...。...である\parencite{Yagi2004}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{八木善彦・菊地　正 (2004).}]ストループ様課題を用いた注意の負荷理論の検討　心理学研究, \textbf{74}, 131--139.
+\end{description}
+\end{quote}
+
+\paragraph{論文のエントリ・レコード例3（巻数のない雑誌）}
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Tokoro1989,
+  author={{所},{正文}},
+  year={1989},
+  title={職業生活意識の立体構造分析に関する試論},
+  journal={応用心理学研究\nobreak,},
+  number={14},
+  pages={1--11},
+  sortname={Tokoro},
+}
+\end{verbatim}
+\end{quote}
+
+この例では，\texttt{journal}フィールドに\texttt{\textbackslash nobreak,}という入力がありますが，これは禁則処理がうまくいかず雑誌名とカンマの間に改行が入ってしまうのを防ぐための措置です。通常は雑誌名だけの入力で問題ありません。
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Tokoro1989}によれば...。...である\parencite{Tokoro1989}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{所　正文 (1989).}]職業生活意識の立体構造分析に関する試論　応用心理学研究, No.14, 1--11.
+\end{description}
+\end{quote}
+
+
+\paragraph{（印刷中）論文のエントリ・レコード例}　
+
+
+\texttt{biblatex-apa}では，論文が印刷中の場合には\texttt{pubstate}フィールドを使用することになっています。\texttt{jpa}もこれに倣います。また，著者名以外の英文表記も付加する場合には，\texttt{epubstate}フィールドにも忘れずに入力してください。
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Shibata2015,
+  author={{芝田},{征司}},
+  title={{BibLaTeX}による文献リスト作成の自動化},
+  journal={LaTeX研究},
+  eauthor={Shibata, S.},
+  etitle={Automation of bibliography compilation using {LaTeX}},
+  ejournal={Japanese Journal of LaTeX},
+  pubstate={印刷中},
+  epubstate={in press},
+}
+\end{verbatim}
+\end{quote}
+\textcite{Shibata2015}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+芝田(印刷中)によれば...。...である(芝田, 印刷中)。
+\end{quote}
+
+
+文献リストの表示\footnote{この文献リストは架空のものです。}
+\begin{quote}
+\begin{description}
+  \item[\textrm{芝田 征司 (印刷中).}]{BibLaTeX}による文献リスト作成の自動化　LaTeX研究\\
+(Shibata, S. (in press). Automation of bibliography compilation using LaTeX. \textit{Japanese Journal of LaTeX}.)
+\end{description}
+\end{quote}
+
+
+\paragraph{紀要論文のエントリ・レコード例}
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Moroi1987,
+  author={{諸井},{克英} and {小山},{久美}},
+  year={1987},
+  title={対人関係への衡平理論の適用 ---予備的検討---},
+  journal={人文論集（静岡大学人文学部社会学科・人文学科報告）},
+  volume={37},
+  pages={15-40},
+  sortname={Moroi},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Moroi1987}によれば...。...である\parencite{Moroi1987}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{諸井克英・小山久美 (1987).}]対人関係への衡平理論の適用 ---備的検討---　人文論集(静岡大学人文学部社会学科・人文学科報告), \textbf{37}, 15--40.
+\end{description}
+\end{quote}
+
+\paragraph{大会発表論文集のエントリ・レコード例1}
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Kugihara2003,
+  author={{釘原},{直樹}},
+  title={実験仮説と結果を知らせることが集団のパーフォーマンスに与える効果},
+  year={2003},
+  journal={日本心理学会第67回大会発表論文集},
+  pages={110},
+  sortname={Kugihara},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Kugihara2003}によれば...。...である\parencite{Kugihara2003}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{釘原直樹 (2003).}]実験仮説と結果を知らせることが集団のパーフォーマンスに与える効果　日本心理学会第67回大会発表論文集, 110.
+\end{description}
+\end{quote}
+
+\paragraph{大会発表論文集のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Koga1992,
+  author={{古賀},{愛人} and {岸本},{陽一} and {寺崎},
+    {正治}},
+  title={多面的感情状態尺度（短縮版）の妥当性},
+  journal={日本心理学会第56回大会発表論文集},
+  volume={646},
+  pages={197--205},
+  year={1994},
+  eauthor={Koga, A. and Kishimoto, Y. and Terasaki, M.},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Koga1992}によれば...。...である\parencite{Koga1992}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{古賀愛人・岸本陽一・寺崎正治 (1994).}]多面的感情状態尺度(短縮版)の妥当性　日本心理学会第56回大会発表論文集, \textbf{646}, 197--205.\\
+(Koga, A., Kishimoto, Y., \& Terasaki, M.)
+\end{description}
+\end{quote}
+
+\paragraph{大会発表論文集のエントリ・レコード例3}
+
+\begin{quote}
+\begin{verbatim}
+@jarticle{Tsuruga2004,
+  author={{敦賀}, {麻理子} and {鈴木}, {直人}},
+  title={``あがり''喚起時の精神生理学的反応},
+  year={2004},
+  journal={感情心理学研究},
+  volume={11},
+  pages={37},
+  sortname={Tsuruga},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Kugihara2003}によれば...。...である\parencite{Kugihara2003}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{敦賀麻理子・鈴木直人 (2004).}]``あがり''喚起時の精神生理学的反応　感情心理学研究, \textbf{11}, 37.
+\end{description}
+\end{quote}
+
+\subsubsection{日本語書籍のエントリ}
+
+日本語書籍のエントリ・レコードには，以下の追加入力フィールドを使用します。
+
+\begin{description}
+
+\item[eauthor] 著者名のローマ字表記。入力の規則は\texttt{author}フィールドに準じる。このフィールドが入力されている場合，文献リスト中では日本語での文献情報に続けて英文表記を行う。
+
+\item[eeditor] 編集者のローマ字表記。入力の規則は\texttt{editor}フィールドに準じる。このフィールドが入力されている場合，文献リスト中では日本語での文献情報に続けて英文表記を行う。
+
+\item[origauthor] 翻訳書の原著者名。入力の規則は\texttt{author}フィールドに準じる。翻訳書の場合，このフィールドの内容が\texttt{author}フィールドの変わりに文中に引用される。
+
+\item[editorrole] 編者の役割。編著，監修など，編書の役割を指定する。とくに指定がない場合，文献リストには``(編)''と表示される。
+
+\item[translatorrole] 監訳など，訳者の役割。とくに指定がない場合，文献リストには``(訳)''と表示される。
+
+\item[etitle] 章タイトルの英文表記。入力の規則は\texttt{title}フィールドに準じる。日本語での文献情報に続けて論文の英文表記を行う際に，章の英訳タイトルとして使用される。
+
+\item[ebooktitle] 書籍タイトルの英文表記。入力の規則は\texttt{booktitle}フィールドに準じる。日本語での文献情報に続けて論文の英文表記を行う際に，書籍の英訳タイトルとして使用される。
+
+\item[origtitle] 翻訳書の原文タイトル。入力の規則は\texttt{booktitle}フィールドに準じる。
+
+\item[epublisher] 出版社の英文表記。入力の規則は\texttt{publisher}フィールドに準じる。日本語での文献情報に続けて論文の英文表記を行う際に使用される。
+
+\item[origpublisher] 翻訳書の原著出版社名。入力の規則は\texttt{publisher}フィールドに準じる。
+
+\end{description}
+
+日本語の書籍情報には出版社の所在地についての記載は必要ありませんが，書籍情報の英文表記を行う際には所在地情報が必要になります。\texttt{jbook}他の書籍エントリでは，出版社の所在地情報に\texttt{location}フィールドをそのまま使用します。
+
+また，\texttt{jarticle}エントリと同様に，文献情報を正しく並び替えるには，\texttt{sortname}あるいは\texttt{eauthor}と\texttt{eeditor}のいずれかに編著者名の英文表記が入力されている必要があります。
+
+
+\paragraph{書籍のエントリ・レコード例1}
+
+\begin{quote}
+\begin{verbatim}
+@jbook{Toyoda1992,
+  author={{豊田},{秀樹}},
+  title={SASによる共分散構造分析},
+  year={1992},
+  publisher={東京大学出版会},
+  eauthor={Toyoda, H.},
+  etitle={Covariance structure analysis with SAS},
+  location={Tokyo},
+  epublisher={University of Tokyo Press},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Toyoda1992}によれば...。...である\parencite{Toyoda1992}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{豊田秀樹 (1992).}]SASによる共分散構造分析　東京大学出版会\\
+(Toyoda, H. (1992). \textit{Covariance structure analysis with SAS}. Tokyo: University of Tokyo Press.)
+\end{description}
+\end{quote}
+
+
+\paragraph{書籍のエントリ・レコード例2}
+\begin{quote}
+\begin{verbatim}
+@jbook{Minami1980,
+  author = {{南},{博}},
+  title = {人間行動学},
+  publisher={岩波書店},
+  year = {1980},
+  sortname={Minami, H.},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Minami1980}によれば...。...である\parencite{Minami1980}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{南　博 (1980).}]人間行動学　岩波書店
+\end{description}
+\end{quote}
+
+
+\paragraph{書籍のエントリ・レコード例3}
+\begin{quote}
+\begin{verbatim}
+@jbook{Yasuda1977,
+  author={{安田},{三郎} and {海野}, {道郎}},
+  title = {社会統計学},
+  edition ={改訂2版},
+  publisher={丸善},
+  year={1977},
+  sortname={Yasuda, S.},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Yasuda1977}によれば...。...である\parencite{Yasuda1977}。
+\end{quote}
+
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{安田三郎・海野道郎 (1977).}]社会統計学　改訂2版　丸善
+\end{description}
+\end{quote}
+
+
+\paragraph{編集書のエントリ・レコード例1}
+
+
+\begin{quote}
+\begin{verbatim}
+@jbook{Ikeuchi1977,
+  editor={{池内},{一}},
+  booktitle={講座社会心理学3　集合現象},
+  year={1977},
+  publisher={東京大学出版会},
+  sortname={Ikeuchi, H.},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Ikeuchi1977}によれば...。...である\parencite{Ikeuchi1977}。
+\end{quote}
+
+
+文献リストの表示
+
+\begin{quote}
+\begin{description}
+  \item[\textrm{池内　一(編) (1977).}]講座社会心理学3　集合現象　東京大学出版会
+\end{description}
+\end{quote}
+
+\paragraph{編集書のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@jbook{Hayashi1976,
+  editor={{林},{知己夫} and {飽戸},{宏}},
+  editorrole={編著},
+  title ={多次元尺度構成法}, 
+  year={1976},
+  publisher={サイエンス社},
+  sortname={Hayashi, C.},
+}\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+本文中の表示
+\begin{quote}
+\textcite{Hayashi1976}によれば...。...である\parencite{Hayashi1976}。
+\end{quote}
+
+
+文献リストの表示
+
+\begin{quote}
+\begin{description}
+  \item[\textrm{林　知己夫・飽戸　宏(編著) 1976.}]多次元尺度構成法　サイエンス社
+\end{description}
+\end{quote}
+
+\paragraph{書籍中の章のエントリ・レコード例1}
+
+\begin{quote}
+\begin{verbatim}
+@jinbook{Takahashi1975,
+  author={{高橋}, {澪子}},
+  editor={{八木}, {冕}},
+  title={心理学における方法論の史的展開},
+  year={1975},
+  booktitle={心理学研究法1　方法論},
+  publisher={東京大学出版会},
+  pages={19-77},
+  sortname={Takahashi, M.},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+本文中の表示
+\begin{quote}
+\textcite{Takahashi1975}によれば...。...である\parencite{Takahashi1975}。
+\end{quote}
+
+
+文献リストの表示
+
+\begin{quote}
+\begin{description}
+  \item[\textrm{高橋澪子(1975).}]心理学における方法論の史的展開　八木　冕(編)　心理学研究法1　方法論　東京大学出版会　pp.19--77.
+\end{description}
+\end{quote}
+
+
+\paragraph{書籍中の章のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@jinbook{Sumitsuji1978,
+  author={{角辻},豊},
+  year={1978},
+  title={情動の表出},
+  editor={{金子},{仁郎} and {菱川},{康夫} and {志水},{彰}},
+  publisher={金原出版},
+  pages={196-209},
+  booktitle={精神生理学IV　情動の生理学},
+  eauthor={Sumitsuji, Y.},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+本文中の表示
+\begin{quote}
+\textcite{Sumitsuji1978}によれば...。...である\parencite{Sumitsuji1978}。
+\end{quote}
+
+
+文献リストの表示
+
+\begin{quote}
+\begin{description}
+  \item[\textrm{角辻 豊 (1978).}]情動の表出　金子仁郎・菱川康夫・志水　彰 (編)　精神生理学IV　情動の生理学　金原出版　pp. 196--209.\\
+(Sumitsuji, Y.)
+\end{description}
+\end{quote}
+
+
+\paragraph{翻訳書のエントリ・レコード例1}
+
+\begin{quote}
+\begin{verbatim}
+@jbook{Hebb1972,
+  origauthor={Hebb, D. O.},
+  origtitle={Textbook of psychology},
+  edition={3rd},
+  origpublisher={Saunders},
+  location={Philadelphia},
+  origyear={1972},
+  author={ヘッブ, D. O.},
+  translator={{白井}, {常} and {鹿取}, {廣人} and 
+  {金城}, {辰夫} and {今村}, {護郎}},
+  year={1975},
+  title={行動学入門　第3版},
+  publisher={紀伊国屋書店},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Hebb1972}によれば...。...である\parencite{Hebb1972}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{Hebb, D. O. (1972).}]\textit{Textbook of psychology}. 3rd ed. Philadelphia: Saunders.\\
+(ヘッブ, D. O. 白井　常・鹿取廣人・金城辰夫・今村護郎(訳)(1975). 行動学入門　第3版　紀伊国屋書店)
+\end{description}
+\end{quote}
+
+
+\paragraph{翻訳書のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@jbook{Blechman1990,
+  origauthor={Blechman, E. A.},
+  author={{ブレックマン}, E. A.},
+  translator={{松山},{義則} and {濱},{治世}},
+  translatorrole={監訳},
+  origbooktitle={Emotions and family: {F}or better or for worse},
+  title={家族の感情心理学},
+  origpublisher={Lawrence Erlbaum Associates},
+  publisher={北大路書房},
+  origyear={1990},
+  location={New York},
+  year={1998},
+}
+\end{verbatim}
+\end{quote}
+
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Blechman1990}によれば...。...である\parencite{Blechman1990}。
+\end{quote}
+
+文献リストの表示
+
+\begin{quote}
+\begin{description}
+  \item[\textrm{Blechman, E. A. (1990).}]\textit{Emotions and family: For better or for worse}. NewYork: Lawrence Erlbaum Associates.\\
+(ブレックマン, E. A. 松山義則・濱　治世 (監訳) (1998). 家族の感情心理学　北大路書房)
+\end{description}
+\end{quote}
+
+\subsubsection{年報・報告書のエントリ}
+
+年報・報告書のエントリでは，特別なフィールドは使用していません。また，現在のところ英文表記には対応していません。文献を正しく並び替えるためには，\texttt{sortname}フィールドを使用してください。
+
+\paragraph{年報・報告書のエントリ・レコード例}
+\begin{verbatim}
+@jreport{Sourifu1990,
+  author={{総理府統計局}},
+  year={1990},
+  title={家計調査年報　1989年版},
+  institution={財団法人日本統計協会},
+  sortname={Sourifu},
+}
+\end{verbatim}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Sourifu1990}によれば...。...である\parencite{Sourifu1990}。
+\end{quote}
+
+文献リストの表示
+
+\begin{quote}
+\begin{description}
+  \item[\textrm{総理府統計局 (1990).}]家計調査年報　1989年版　財団法人日本統計協会
+\end{description}
+\end{quote}
+
+\subsubsection{学位論文のエントリ}
+
+学位論文のエントリでは，特別なフィールドは使用していません。また，現在のところ英文表記には対応していません。文献を正しく並び替えるためには，\texttt{sortname}フィールドを使用してください。
+
+\paragraph{学位論文のエントリ・レコード例}
+
+\begin{quote}
+\begin{verbatim}
+@jthesis{Taniguchi2001,
+  author={{谷口},{弘一}},
+  year={2001},
+  title={サポートの互恵性と精神的健康の関連に関する研究 
+  ---個人内および個人間発達の観点からの検討---},
+  institution={広島大学大学院生物圏科学研究科},
+  type={博士論文 (未公刊)},
+  sortname={Taniguchi},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Taniguchi2001}によれば...。...である\parencite{Taniguchi2001}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{谷口弘一 (2001).}]サポートの互恵性と精神的健康の関連に関する研究 ---個人内および個人間発達の観点からの検討---　広島大学大学院生物圏科学研究科博士論文 (未公刊).
+\end{description}
+\end{quote}
+
+
+\subsubsection{新聞記事のエントリ}
+
+新聞記事のエントリでは，特別なフィールドは使用していません。また，現在のところ英文表記には対応していません。文献を正しく並び替えるためには，\texttt{sortname}フィールドを使用してください。
+
+\paragraph{新聞記事のエントリ・レコード例1}
+
+
+\begin{quote}
+\begin{verbatim}
+@jnewsarticle{Maicho2001,
+  author={{毎朝新聞}},
+  year={2004},
+  title={学生の飲酒問題にいかに立ち向かうか},
+  issue={11月24日朝刊},
+  sortname={Maicho},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Maicho2001}によれば...。...である\parencite{Maicho2001}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{毎朝新聞 (2004).}]学生の飲酒問題にいかに立ち向かうか　11月24日朝刊
+\end{description}
+\end{quote}
+
+\paragraph{新聞記事のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@jnewsarticle{Berkowitz2004,
+  author={{ベルコビッツ}},
+  year={2004},
+  title={学生の飲酒問題にいかに立ち向かうか},
+  issuetitle={毎朝新聞},
+  issue={11月24日朝刊},
+  sortname={Berkowitz},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Berkowitz2004}によれば...。...である\parencite{Berkowitz2004}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{ベルコビッツ (2004).}]学生の飲酒問題にいかに立ち向かうか　毎朝新聞11月24日朝刊
+\end{description}
+\end{quote}
+
+\subsubsection{オンライン資料のエントリ}
+
+オンライン資料のエントリでは，特別なフィールドは使用していません。また，現在のところ英文表記には対応していません。文献を正しく並び替えるためには，\texttt{sortname}フィールドを使用してください。
+
+なお，オンライン資料ではサイトの更新日と閲覧日の2つの日付を記載する場合，サイト更新日は\texttt{organization}フィールドの末尾に日本語の日付表記で入力をしてください。また，最終閲覧日は\texttt{urldate}フィールドに入力をします。\texttt{urldate}フィールドは{\BibLaTeX}の日付フォーマットで入力する必要がある点に注意してください。
+
+\paragraph{オンライン資料のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@jonline{JPA2004,
+  author={{日本心理学会}},
+  year={2004},
+  title={{事務局からのおしらせ}},
+  organization={日本心理学会　2004年2月13日},
+  url={http://wwwsoc.nii.ac.jp/cgi-bin/jpa/minibbs.cgi?log=log1},
+  urldate={2004-02-25},
+  sortname={NihonShinriGakkai},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{JPA2004}によれば...。...である\parencite{JPA2004}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{日本心理学会 (2004).}]事務局からのおしらせ　日本心理学会　2004年2月13日 <http://wwwsoc.nii.ac.jp/cgi-bin/jpa/minibbs.cgi?log=log1>\\
+  (2004年2月25日)
+\end{description}
+\end{quote}
+
+\subsubsection{英語文献のエントリ}
+英語文献のエントリでは，翻訳書を除き，文献タイプ・入力フィールドともに\texttt{biblatex-apa}と同じです。本文中や文献リストには『心理学研究』の書式に添った形で表示されます。
+
+
+\paragraph{論文のエントリ・レコード例1}
+
+\begin{quote}
+\begin{verbatim}
+@article{Paivio1968,
+  author={Paivio, A.},
+  year={1968},
+  title={A factor-analytic study of word attributes and verbal learning},
+  journal={Journal of Verbal Learning and Verbal Behavior},
+  volume={7},
+  pages={41-49},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Paivio1968}によれば...。...である\parencite{Paivio1968}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{Paivio, A. (1968).}]A factor-analytic study of word attributes and verbal learning. \textit{Journal of Verbal Learning and Verbal Behavior}, \textbf{7}, 41--49.
+\end{description}
+\end{quote}
+
+
+\paragraph{論文のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@article{Ekman1990,
+  author={Ekman, P. and Davidson, R. and Friesen, W, V},
+  year={1990},
+  title={The Duchenne smile},
+  subtitle={Emotional expression and brain physiology, {II}},
+  journal={Journal of Personality and Social Psychology},
+  volume={58},
+  pages={342-353},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Ekman1990}によれば...。...である\parencite{Ekman1990}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{Ekman, P., Davidson, R., \& Friesen, V., W. (1990).}]The duchenne smile: Emotional expression and brain physiology, II. \textit{Journal of Personality and Social Psychology}, \textbf{58}, 342--353.
+\end{description}
+\end{quote}
+
+
+\paragraph{書籍のエントリ・レコード例1}
+
+\begin{quote}
+\begin{verbatim}
+@book{Ekman1978,
+  author={Ekman, P. and Friesen, W, V},
+  year={1978},
+  title={Facial Action Coding System},
+  subtitle={A technique for the measurement of facial movement},
+  location={Palo Alto, CA},
+  publisher={Consulting Psychologists Press},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Ekman1978}によれば...。...である\parencite{Ekman1978}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{Ekman, P. \& Friesen, V., W. (1978).}]\textit{Facial action coding system: A technique for the measurement of facial movement}. Palo Alto, CA: Consulting Psychologists Press.
+\end{description}
+\end{quote}
+
+
+\paragraph{書籍のエントリ・レコード例2}
+
+\begin{quote}
+\begin{verbatim}
+@inbook{Ekman1982,
+  author={Ekman, P. and Friesen, W, V and Ellsworth, P},
+  year={1982},
+  title={Conceptual ambiguities},
+  editor={P. Ekman},
+  booktitle={Emotion in human face},
+  edition={2nd ed.},
+  location={Palo Alto, CA},
+  publisher={Consulting Psychologists Press},
+  pages={98-110},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Ekman1982}によれば...。...である\parencite{Ekman1982}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{Ekman, P., Friesen, V., W, \& Ellsworth, P. (1982).}]Conceptual ambiguities. In P. Ekman (Ed.), \textit{Emotion in human face}. 2nd ed. Palo Alto, CA: Consulting Psychologists Press, pp. 98--110.
+\end{description}
+\end{quote}
+
+
+\paragraph{書籍のエントリ・レコード例3}
+
+\begin{quote}
+\begin{verbatim}
+@inbook{Peterson1977,
+  author={Peterson, L. R. and Rawlings, L. and Cohen, C.},
+  year={1977},
+  title={The internal construction of spatial patterns},
+  editor={G. H. Bower},
+  booktitle={The psychology of learning and motivation},
+  booksubtitle={Advances in research and theory},
+  volume={11},
+  location={New York},
+  publisher={Academic Press},
+  pages={245-276},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Peterson1977}によれば...。...である\parencite{Peterson1977}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{Peterson, L. R., Rawlings, L., \& Cohen, C. (1977).}]The internal construction of spatial patterns. In G. H. Bower (Ed.), \textit{The psychology of learning and motivation: Advances in research and theory}. Vol. 11. New York: Academic Press, pp. 245--276.
+\end{description}
+\end{quote}
+
+\paragraph{翻訳書のエントリ・レコード例}　
+
+他言語から英語への翻訳書籍については，翻訳者名を\texttt{titleaddon}フィールドに，原著情報を\texttt{addendum}フィールドに入力してください。
+
+\begin{quote}
+\begin{verbatim}
+@book{Duchenne1990, 
+  author={Duchenne de Boulongne, G. B.},
+  year={1990},
+  title={The mechanism of human facial expression},
+  titleaddon={Trans. \& Ed. by R. A. Cuthbertson},
+  location={Cambridge},
+  publisher={Cambridge University Press},
+  addendum={Original work published (1862).},
+} 
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{Duchenne1990}によれば...。...である\parencite{Duchenne1990}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{Duchenne de Boulongne, G. B. (1990).}]\textit{The mechanism of human facial expression}. (Trans. \& Ed. by R. A. Cuthbertson). Cambridge: Cambridge University Press. (Original work published (1862).)
+\end{description}
+\end{quote}
+
+
+\paragraph{オンライン資料のエントリ・レコード例}
+
+\begin{quote}
+\begin{verbatim}
+@online{APA2004,
+  author={{American Psychological Association}},
+  year={2004},
+  title={{APA} topic: {ADHD}},
+  organization={{American Psychological Association}},
+  url={http://www.apa.org/topics/topic_adhd.html},
+  urldate={2004-02-25},
+}
+\end{verbatim}
+\end{quote}
+
+\textbf{出力結果}
+
+本文中の表示
+\begin{quote}
+\textcite{APA2004}によれば...。...である\parencite{APA2004}。
+\end{quote}
+
+文献リストの表示
+\begin{quote}
+\begin{description}
+  \item[\textrm{American Psychological Association (2004).}]APA topic: ADHD. American Psychological Association <http://www.apa.org/topics/topic\_adhd.html> (Feb. 25, 2004)
+\end{description}
+\end{quote}
+
+
+\printbibliography[title=引用文献]
+\end{document}
