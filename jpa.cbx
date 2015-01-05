@@ -6,7 +6,6 @@
 \renewcommand{\finalnamedelim}{\iffieldequalstr{textlang}{ja}{\unspace{・}}{\addspace\&\space}}
 \renewcommand{\multinamedelim}{\iffieldequalstr{textlang}{ja}{\unspace{・}}{\addcomma\space}}
 
-
 % 日本語論文の場合，'et al' を'他'に変更
 % 初出の場合は全著者名を表示
 \DeclareNameFormat{labelname}{%
@@ -31,8 +30,9 @@
 			{\usebibmacro{labelname:doname}{#1}{#2}{#3}{#4}{#5}{#6}{#7}{#8}}}}
 
 \DeclareCiteCommand{\nptextcite}
-	{\iffieldequalstr{textlang}{ja}{}
-		{\renewcommand{\finalnamedelim}{\ifnum\value{liststop}>2 \finalandcomma\fi\addspace\&\space}}%
+	{\iffieldequalstr{textlang}{ja}{
+		\renewcommand{\finalnamedelim}{\unspace{・}}
+	}{\renewcommand{\finalnamedelim}{\ifnum\value{liststop}>2 \finalandcomma\fi\addspace\&\space}}%
 	\usebibmacro{cite:init}%
 	\usebibmacro{prenote}}
 	{\usebibmacro{citeindex}%
@@ -47,7 +47,7 @@
 	\usebibmacro{cite:post}}
 
 \DeclareCiteCommand{\parencite}[\mkbibparens]
-  {\iffieldequalstr{textlang}{ja}{}
+  {\iffieldequalstr{textlang}{ja}{\renewcommand{\finalnamedelim}{\unspace{・}}}
   {\renewcommand{\finalnamedelim}{\ifnum\value{liststop}>2 \finalandcomma\fi\addspace\&\space}}%
    \usebibmacro{cite:init}%
    \usebibmacro{prenote}}
@@ -57,8 +57,9 @@
   {\usebibmacro{postnote}%
    \usebibmacro{cite:post}}
 
+
 \DeclareCiteCommand*{\parencite}[\mkbibparens]
-	{\iffieldequalstr{textlang}{ja}{}{
+	{\iffieldequalstr{textlang}{ja}{\renewcommand{\finalnamedelim}{\unspace{・}}}{
 	 \renewcommand{\finalnamedelim}{\ifnum\value{liststop}>2 \finalandcomma\fi\addspace\&\space}}%
 	 \usebibmacro{cite:init}%
 	 \usebibmacro{prenote}}
@@ -110,7 +111,7 @@
     \ifbool{cbx:parens}
       {\bibcloseparen\global\boolfalse{cbx:parens}}
       {}%
-      \setunit{\compcitedelim}%
+      \setunit{;\space}%
       \ifthenelse{\ifnameundef{labelname}\OR\iffieldequalstr{entrytype}{patent}}
   % No author/editor or patent
        {\iffieldundef{shorthand}%

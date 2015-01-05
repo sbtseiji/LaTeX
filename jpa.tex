@@ -129,11 +129,17 @@
   例）\texttt{\textbackslash citeyear\{Kusumi1994\}}　→　\citeyear{Kusumi1994}
 \end{description}
 
+なお，\texttt{\textbackslash parencite}で英語文献と日本語文献をひとまとめにして引用した場合，著者名の区切り文字が日英で正しく切り替えられません。このような場合，次のように\texttt{\textbackslash nptextcite}を使用して外国語文献と日本語文献を別々に記述してください。
+
+\begin{quote}
+\begin{verbatim}
+(\nptexicite{Ekman1982,Ekman1978};\nptexicite{Koga1992})
+\end{verbatim}
+\end{quote}
 
 \section{文献ファイル}
 \subsection{文献タイプ}
 \texttt{jpa}パッケージでは，\texttt{biblatex-apa}で使用される文献タイプ以外に，以下の日本語用文献タイプを追加しています。
-
 \begin{description}
   \item[jarticle]日本語論文，論文集など
   \item[jbook]日本語書籍，翻訳書など

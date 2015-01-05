@@ -59,8 +59,14 @@
       \step[fieldset = textlang, fieldvalue=ja]
     }
     \map{
+      \pertype{jbook}
       \step[fieldsource=namec, final]
       \step[fieldset = sortname, origfieldval]
+    }
+    \map{
+      \pertype{jarticle}
+      \step[fieldsource=journaltitle, final]
+      \step[fieldset = ejournal, origfieldval]
     }
   }
 }
@@ -581,7 +587,7 @@
      \printfield{series}
      \setunit{\addcomma\space}}%
   \printfield{volume}%
-  \printfield{number}%
+  \iffieldundef{number}{}{\printfield[pyearorunkyear]{number}}%
   \setunit{\addspace}\newblock
   \usebibmacro{issuename}%
   \newunit}
@@ -591,10 +597,14 @@
 }
 
 \newbibmacro{ejournal}{%
-  \printtext[ejournal]{%
+  \iffieldundef{ejournal}{\printtext[ejournal]{%
+  \printfield[titlecase]{journaltitle}%
+  \setunit{\subtitlepunct}%
+  \printfield[titlecase]{journalsubtitle}}}
+  {\printtext[ejournal]{%
   \printfield[titlecase]{ejournal}%
   \setunit{\subtitlepunct}%
-  \printfield[titlecase]{journalsubtitle}}
+  \printfield[titlecase]{journalsubtitle}}}
 }
 
 \newbibmacro{origauthor}{%
