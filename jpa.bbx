@@ -23,7 +23,7 @@
 {\global\boolfalse{jpa:engcite}}}
 
 \DeclareDatamodelEntrytypes{jarticle,jbook,jinbook,jmvbook,jreport,jonline,jthesis,jnewsarticle}
-\DeclareDatamodelFields[type=field,datatype=literal]{etitle,ebooktitle,ejournal,origbooktitle,origtitle,textlang,editorrole,translatorrole,epubstate}
+\DeclareDatamodelFields[type=field,datatype=literal]{etitle,ebooktitle,ejournal,origbooktitle,origtitle,textlang,editorrole,translatorrole,epubstate,esubtitle}
 \DeclareDatamodelFields[type=list,datatype=literal]{origpublisher}
 
 \DefineBibliographyExtras{american}{%
@@ -274,7 +274,7 @@
   \printfield{series}%
   \newunit\newblock
   \printfield{note}%
-  \newunit\newblock
+  \newunit\newblock\setunit*{\addspace}
   \usebibmacro{location+publisher}%
   \addcomma\addspace
   \usebibmacro{doi+eprint+url}%
@@ -287,7 +287,7 @@
     {\usebibmacro{related:init}%
      \usebibmacro{related}}
     {}%
-  \printfield{pages}%
+  \printfield{pages}\adddot\newblock%
   \usebibmacro{apa:pageref}%
   \usebibmacro{apa:finpunct}%
   \usebibmacro{finentry}}
@@ -540,7 +540,7 @@
     {\printtext[etitle]{%
       \printfield[apacase]{etitle}%
       \setunit{\subtitlepunct}%
-      \printfield[apacase]{subtitle}}}
+      \printfield[apacase]{esubtitle}}}
      \setunit{\addspace}%
      \printfield{titleaddon}%
      \ifthenelse{%
